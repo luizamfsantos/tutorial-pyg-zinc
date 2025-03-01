@@ -46,23 +46,28 @@ python main.py
 ### Option 2: Run the code on Google Colab
 
 1. Create a new notebook on Google Colab
+
 2. Change the runtime to GPU
+
 3. Clone the repository
 ```python
 !git clone https://github.com/luizamfsantos/tutorial-pyg-zinc.git
 ```
+
 4. Install the requirements
 ```python
 !pip install -r tutorial-pyg-zinc/requirements.txt
 import sys
 sys.path.append('tutorial-pyg-zinc')
 ```
-5. Optional: load data
-This will take a while to run for the first time.
+
+5. Optional: Load data before running the code.
+This will take a while to run for the first time. So, I recommend running this before running the code.
 ```python
 from load_data import get_data
 get_data()
 ```
+
 6. Run the code with 1 epoch.
 This will test if the code is running correctly. It will
 also give you an idea of how long it will take to run the code.
@@ -71,6 +76,7 @@ sys.argv = ['', '--epoch', '1', '--debug']
 from main import main
 main()
 ```
+
 7. Run the code
 ```python
 sys.argv = ['']
