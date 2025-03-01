@@ -43,7 +43,7 @@ def train(
     model: torch.nn.Module,
     optimizer: torch.optim.Optimizer,
     train_loader: torch.utils.data.DataLoader,
-    data: torch.Tensor,
+    device: torch.device,
 ):
     model.train()
 
@@ -69,7 +69,7 @@ def train(
 def test(
     model: torch.nn.Module,
     test_loader: torch.utils.data.DataLoader,
-    data: torch.Tensor,
+    device: torch.device,
 ):
     model.eval()
 
@@ -92,7 +92,7 @@ def test(
 def main():
     args = parse_arguments()
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    attn_kwargs = {'droupout': 0.5}
+    attn_kwargs = {'dropout': 0.5}
 
     model = GPS(
         channels=args.channels, 
@@ -117,12 +117,12 @@ def main():
     train_loader, validation_loader, test_loader = get_data()
 
     for epoch in range(args.epochs):
-        train_loss = train(model, optimizer, train_loader, data)
-        val_mae = test(model, validation_loader, data)
+        train_loss = train(model, optimizer, train_loader, device)
+        val_mae = test(model, validation_loader, device)
         scheduler.step(val_mae)
         print(f'Epoch: {epoch:03d}, Train Loss: {train_loss:.4f}, Val MAE: {val_mae:.4f}')
         
-    test_mae = test(model, test_loader, data)
+    test_mae = test(model, test_loader, device)
     print(f'Test MAE: {test_mae:.4f}')
 
 if __name__ == '__main__':
