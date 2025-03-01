@@ -1,4 +1,4 @@
-import argsparse
+import argparse
 import torch
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from models import GPS
@@ -124,3 +124,6 @@ def main():
         
     test_mae = test(model, test_loader, data)
     print(f'Test MAE: {test_mae:.4f}')
+
+if __name__ == '__main__':
+    main()

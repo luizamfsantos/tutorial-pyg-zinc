@@ -1,5 +1,6 @@
 import torch_geometric.transforms as T
 from torch_geometric.datasets import ZINC
+from torch_geometric.loader import DataLoader
 
 def get_data():
     transform = T.AddRandomWalkPE(
@@ -25,7 +26,7 @@ def get_data():
     )
     validation_loader = DataLoader(
         validation_dataset,
-        batch_size=32,
+        batch_size=64,
         shuffle=False,
     )
     test_dataset = ZINC(
@@ -36,7 +37,7 @@ def get_data():
     )
     test_loader = DataLoader(
         test_dataset,
-        batch_size=32,
+        batch_size=64,
         shuffle=False,
     )
     return train_loader, validation_loader, test_loader
