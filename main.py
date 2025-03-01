@@ -3,6 +3,25 @@ import torch
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from models import GPS
 from load_data import get_data
+import logging
+
+logging.basicConfig(
+    format='%(asctime)s - %(levelname)s [[%(filename)s:%(lineno)d]]: %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S',
+    level=logging.INFO
+)
+logger = logging.getLogger(__name__)
+
+
+def timeit(func):
+    def wrapper(*args, **kwargs):
+        import time
+        start = time.time()
+        result = func(*args, **kwargs)
+        end = time.time()
+        logger.debug(f'{func.__name__} took {end - start:.2f} seconds')
+        return result
+    return wrapper
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
@@ -36,9 +55,15 @@ def parse_arguments():
         default=100,
         help='Number of epochs to train the model'
     )
+    parser.add_argument(
+        '-d', '--debug',
+        action='store_true',
+        help='Enable debug mode'
+    )
 
     return parser.parse_args()
 
+@timeit
 def train(
     model: torch.nn.Module,
     optimizer: torch.optim.Optimizer,
@@ -88,9 +113,12 @@ def test(
         ).abs().sum().item()
     return total_error / len(test_loader.dataset)
 
-
+@timeit
 def main():
     args = parse_arguments()
+    if args.debug:
+        logger.setLevel(logging.DEBUG)
+
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     attn_kwargs = {'dropout': 0.5}
 
@@ -116,14 +144,14 @@ def main():
 
     train_loader, validation_loader, test_loader = get_data()
 
-    for epoch in range(args.epochs):
+    for epoch in range(1, args.epochs + 1):
         train_loss = train(model, optimizer, train_loader, device)
         val_mae = test(model, validation_loader, device)
         scheduler.step(val_mae)
-        print(f'Epoch: {epoch:03d}, Train Loss: {train_loss:.4f}, Val MAE: {val_mae:.4f}')
+        logger.info(f'Epoch: {epoch:03d}, Train Loss: {train_loss:.4f}, Val MAE: {val_mae:.4f}')
         
     test_mae = test(model, test_loader, device)
-    print(f'Test MAE: {test_mae:.4f}')
+    logger.info(f'Test MAE: {test_mae:.4f}')
 
 if __name__ == '__main__':
     main()
